@@ -1,542 +1,1581 @@
+```html
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🌿 植物日誌</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    body {
-      background: #f2ece0;
-      font-family: 'Noto Sans TC', sans-serif;
-      color: #3a4a3a;
-      min-height: 100vh;
-    }
+<title>🌿 P's 植物日誌 Pro</title>
 
-    /* ── Header ── */
-    header {
-      background: rgba(0,0,0,0.03);
-      border-bottom: 1px solid rgba(0,0,0,0.08);
-      padding: 18px 24px 0;
-      position: sticky; top: 0; z-index: 10;
-      backdrop-filter: blur(6px);
-    }
-    .header-inner { max-width: 960px; margin: 0 auto; }
-    .logo { display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px; }
-    .logo-icon { font-size: 26px; }
-    .logo-title { font-size: 22px; font-weight: 700; color: #5a7e5e; font-family: 'Noto Serif TC', serif; letter-spacing: 1px; }
-    .logo-count { font-size: 11px; color: rgba(0,0,0,0.3); margin-left: 4px; }
-    .tabs { display: flex; }
-    .tab-btn {
-      background: none; border: none; border-bottom: 2px solid transparent;
-      color: rgba(0,0,0,0.38); padding: 8px 20px;
-      cursor: pointer; font-size: 14px; font-weight: 400;
-      font-family: 'Noto Sans TC', sans-serif;
-      transition: all 0.2s;
-    }
-    .tab-btn.active { border-bottom-color: #5a7e5e; color: #5a7e5e; font-weight: 700; }
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@700&family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
 
-    /* ── Main ── */
-    main { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
-    .section { display: none; }
-    .section.active { display: block; }
+<style>
 
-    /* ── Controls ── */
-    .controls { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-    .controls input, .controls select {
-      background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.12);
-      border-radius: 10px; color: #2c3a2c; padding: 10px 14px; font-size: 14px;
-      font-family: 'Noto Sans TC', sans-serif; outline: none;
-    }
-    .controls input { flex: 1; min-width: 180px; }
-    .controls select { min-width: 120px; cursor: pointer; }
-    .btn-add {
-      background: linear-gradient(135deg, #7a9e7e, #5a7e5e);
-      border: none; border-radius: 10px; color: #fff;
-      padding: 10px 20px; cursor: pointer; font-size: 14px; font-weight: 700;
-      white-space: nowrap; font-family: 'Noto Sans TC', sans-serif;
-      transition: opacity 0.2s;
-    }
-    .btn-add:hover { opacity: 0.88; }
+{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
 
-    /* ── Stats strip ── */
-    .stats { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-    .stat-card {
-      background: rgba(90,126,94,0.08); border: 1px solid rgba(90,126,94,0.18);
-      border-radius: 12px; padding: 10px 18px; flex: 1; min-width: 100px;
-    }
-    .stat-label { font-size: 10px; color: rgba(0,0,0,0.35); margin-bottom: 2px; }
-    .stat-value { font-size: 18px; font-weight: 700; color: #5a7e5e; }
+body{
+  min-height:100vh;
+  font-family:'Noto Sans TC',sans-serif;
+  color:#2f3d2f;
 
-    /* ── Plant Grid ── */
-    .plant-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-      gap: 14px;
-    }
-    .plant-card {
-      background: rgba(255,255,255,0.55);
-      border: 1px solid rgba(0,0,0,0.08);
-      border-radius: 20px; padding: 22px 20px 18px;
-      display: flex; flex-direction: column; gap: 12px;
-      position: relative; overflow: hidden;
-      transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
-    }
-    .plant-card:hover {
-      transform: translateY(-3px);
-      border-color: rgba(100,130,100,0.35);
-      box-shadow: 0 8px 32px rgba(100,130,100,0.12);
-    }
-    .new-badge {
-      position: absolute; top: 0; right: 0;
-      background: linear-gradient(135deg,#7a9e7e,#5a7e5e);
-      color: #fff; font-size: 10px; font-weight: 700;
-      padding: 4px 10px; border-radius: 0 20px 0 12px; letter-spacing: 0.5px;
-    }
-    .card-top { display: flex; justify-content: space-between; align-items: flex-start; }
-    .card-emoji { font-size: 22px; margin-bottom: 2px; }
-    .card-name { font-size: 18px; font-weight: 700; color: #2c3a2c; font-family: 'Noto Serif TC', serif; line-height: 1.2; }
-    .card-meta { font-size: 11px; color: rgba(0,0,0,0.38); margin-top: 3px; }
-    .card-actions { display: flex; gap: 6px; }
-    .card-actions button {
-      background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.1);
-      border-radius: 8px; color: rgba(0,0,0,0.4);
-      cursor: pointer; font-size: 13px; padding: 4px 8px;
-      transition: background 0.15s;
-    }
-    .card-actions button:hover { background: rgba(0,0,0,0.1); }
-    .card-info { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; }
-    .info-cell { background: rgba(0,0,0,0.04); border-radius: 10px; padding: 7px 10px; }
-    .info-label { font-size: 10px; color: rgba(0,0,0,0.35); margin-bottom: 2px; }
-    .info-value { font-size: 13px; color: #3a4a3a; font-weight: 500; }
-    .info-value.today { color: #5a7e5e; }
-    .health-track { background: rgba(0,0,0,0.08); border-radius: 99px; height: 6px; overflow: hidden; margin-bottom: 3px; }
-    .health-fill { height: 100%; border-radius: 99px; transition: width 0.6s ease; }
-    .health-pct { font-size: 11px; color: rgba(0,0,0,0.38); }
-    .card-note { font-size: 11px; color: rgba(0,0,0,0.35); border-top: 1px solid rgba(0,0,0,0.07); padding-top: 8px; font-style: italic; }
-    .empty { text-align: center; color: rgba(0,0,0,0.25); padding: 60px 0; font-size: 15px; }
+  background:
+    radial-gradient(circle at top left,#dce8d8,transparent 35%),
+    radial-gradient(circle at bottom right,#efe3d0,transparent 40%),
+    #f2ece0;
+}
 
-    /* ── Purchase Tab ── */
-    .purchase-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 24px; }
-    .purchase-stat {
-      background: rgba(90,126,94,0.07); border: 1px solid rgba(90,126,94,0.18);
-      border-radius: 16px; padding: 18px 16px; text-align: center;
-    }
-    .purchase-stat-emoji { font-size: 24px; margin-bottom: 4px; }
-    .purchase-stat-value { font-size: 22px; font-weight: 700; color: #5a7e5e; font-family: 'Noto Serif TC', serif; }
-    .purchase-stat-label { font-size: 11px; color: rgba(0,0,0,0.35); margin-top: 2px; }
-    .purchase-list { display: flex; flex-direction: column; gap: 8px; }
-    .purchase-item {
-      background: rgba(255,255,255,0.6); border: 1px solid rgba(0,0,0,0.07);
-      border-radius: 14px; padding: 14px 18px;
-      display: flex; align-items: center; gap: 14px;
-    }
-    .purchase-icon { font-size: 24px; }
-    .purchase-info { flex: 1; }
-    .purchase-name { font-weight: 600; color: #2c3a2c; margin-bottom: 2px; }
-    .purchase-sub { font-size: 12px; color: rgba(0,0,0,0.38); }
-    .purchase-price { text-align: right; }
-    .purchase-amount { font-size: 18px; font-weight: 700; color: #5a7e5e; }
-    .purchase-type { font-size: 10px; color: rgba(0,0,0,0.28); }
+/ ---------- HEADER ---------- /
 
-    /* ── Modal ── */
-    .modal-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.4); z-index: 100;
-      align-items: center; justify-content: center; padding: 20px;
-    }
-    .modal-overlay.open { display: flex; }
-    .modal-box {
-      background: #f5f0e8; border: 1px solid rgba(100,130,100,0.2);
-      border-radius: 24px; padding: 28px; width: 100%; max-width: 480px;
-      max-height: 85vh; overflow-y: auto;
-    }
-    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-    .modal-title { font-size: 18px; font-weight: 700; color: #5a7e5e; font-family: 'Noto Serif TC', serif; }
-    .modal-close { background: none; border: none; color: rgba(0,0,0,0.35); font-size: 20px; cursor: pointer; }
+header{
+  position:sticky;
+  top:0;
+  z-index:100;
 
-    /* ── Form ── */
-    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .form-grid .span2 { grid-column: span 2; }
-    .form-label { font-size: 11px; color: rgba(0,0,0,0.4); margin-bottom: 5px; display: block; letter-spacing: 0.5px; }
-    .form-input, .form-select, .form-textarea {
-      background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.12);
-      border-radius: 10px; color: #2c3a2c; padding: 10px 14px;
-      font-size: 14px; width: 100%; outline: none;
-      font-family: 'Noto Sans TC', sans-serif;
-    }
-    .form-textarea { resize: vertical; min-height: 60px; }
-    .form-range { width: 100%; accent-color: #5a7e5e; }
-    .form-actions { display: flex; gap: 10px; justify-content: flex-end; padding-top: 4px; }
-    .btn-cancel {
-      background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.1);
-      border-radius: 10px; color: rgba(0,0,0,0.5);
-      padding: 10px 20px; cursor: pointer; font-size: 14px;
-      font-family: 'Noto Sans TC', sans-serif;
-    }
-    .btn-save {
-      background: linear-gradient(135deg,#7a9e7e,#5a7e5e);
-      border: none; border-radius: 10px; color: #fff;
-      padding: 10px 24px; cursor: pointer; font-size: 14px; font-weight: 700;
-      font-family: 'Noto Sans TC', sans-serif;
-    }
-    .btn-save:disabled { background: rgba(0,0,0,0.1); color: rgba(0,0,0,0.3); cursor: default; }
+  padding:18px 22px 0;
 
-    @media (max-width: 500px) {
-      .purchase-stats { grid-template-columns: 1fr; }
-      .form-grid { grid-template-columns: 1fr; }
-      .form-grid .span2 { grid-column: span 1; }
-    }
-  </style>
+  background:rgba(255,255,255,0.18);
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+
+  border-bottom:1px solid rgba(255,255,255,0.2);
+}
+
+.header-inner{
+  max-width:1100px;
+  margin:auto;
+}
+
+.logo{
+  display:flex;
+  align-items:baseline;
+  gap:10px;
+  margin-bottom:16px;
+}
+
+.logo-title{
+  font-family:'Noto Serif TC',serif;
+  font-size:24px;
+  color:#5a7e5e;
+}
+
+.logo-count{
+  font-size:12px;
+  opacity:.5;
+}
+
+.tabs{
+  display:flex;
+  gap:8px;
+  overflow:auto;
+}
+
+.tab-btn{
+  border:none;
+  background:none;
+  padding:10px 18px;
+  cursor:pointer;
+
+  border-bottom:2px solid transparent;
+
+  font-size:14px;
+  color:rgba(0,0,0,.4);
+
+  transition:.2s;
+}
+
+.tab-btn.active{
+  color:#5a7e5e;
+  border-color:#5a7e5e;
+  font-weight:700;
+}
+
+/ ---------- MAIN ---------- /
+
+main{
+  max-width:1100px;
+  margin:auto;
+  padding:24px 16px 80px;
+}
+
+.section{
+  display:none;
+}
+
+.section.active{
+  display:block;
+}
+
+/ ---------- CONTROLS ---------- /
+
+.controls{
+  display:flex;
+  gap:10px;
+  margin-bottom:20px;
+  flex-wrap:wrap;
+}
+
+.controls input,
+.controls select{
+  flex:1;
+
+  min-width:160px;
+
+  background:rgba(255,255,255,.3);
+
+  border:1px solid rgba(255,255,255,.3);
+
+  backdrop-filter:blur(12px);
+
+  border-radius:14px;
+
+  padding:12px 14px;
+
+  font-size:14px;
+
+  color:#2f3d2f;
+}
+
+.btn-add{
+  border:none;
+  cursor:pointer;
+
+  background:linear-gradient(135deg,#7a9e7e,#5a7e5e);
+
+  color:white;
+
+  padding:12px 20px;
+
+  border-radius:14px;
+
+  font-weight:700;
+}
+
+/ ---------- STATS ---------- /
+
+.stats{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:20px;
+}
+
+.stat-card{
+  flex:1;
+  min-width:140px;
+
+  background:rgba(255,255,255,.28);
+
+  backdrop-filter:blur(16px);
+
+  border:1px solid rgba(255,255,255,.25);
+
+  box-shadow:0 8px 32px rgba(0,0,0,.06);
+
+  border-radius:20px;
+
+  padding:16px;
+}
+
+.stat-label{
+  font-size:11px;
+  opacity:.5;
+}
+
+.stat-value{
+  margin-top:6px;
+  font-size:22px;
+  font-weight:700;
+  color:#5a7e5e;
+}
+
+/ ---------- GRID ---------- /
+
+.plant-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+  gap:16px;
+}
+
+.plant-card{
+  position:relative;
+
+  background:rgba(255,255,255,.35);
+
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+
+  border:1px solid rgba(255,255,255,.3);
+
+  box-shadow:0 8px 32px rgba(0,0,0,.08);
+
+  border-radius:24px;
+
+  overflow:hidden;
+
+  padding:18px;
+
+  transition:.2s;
+}
+
+.plant-card:hover{
+  transform:translateY(-3px);
+}
+
+.plant-photo{
+  width:100%;
+  height:190px;
+  object-fit:cover;
+  border-radius:18px;
+  margin-bottom:14px;
+}
+
+.new-badge{
+  position:absolute;
+  top:0;
+  right:0;
+
+  background:linear-gradient(135deg,#7a9e7e,#5a7e5e);
+
+  color:white;
+
+  padding:6px 12px;
+
+  border-radius:0 24px 0 16px;
+
+  font-size:10px;
+  font-weight:700;
+}
+
+.card-top{
+  display:flex;
+  justify-content:space-between;
+}
+
+.card-name{
+  font-family:'Noto Serif TC',serif;
+  font-size:20px;
+  color:#2f3d2f;
+}
+
+.card-meta{
+  margin-top:4px;
+  font-size:12px;
+  opacity:.5;
+}
+
+.card-actions{
+  display:flex;
+  gap:6px;
+}
+
+.card-actions button{
+  border:none;
+  cursor:pointer;
+
+  background:rgba(255,255,255,.4);
+
+  backdrop-filter:blur(10px);
+
+  border-radius:10px;
+
+  padding:6px 8px;
+}
+
+.card-info{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+
+  margin-top:14px;
+}
+
+.info-cell{
+  background:rgba(255,255,255,.22);
+
+  border-radius:14px;
+
+  padding:10px;
+}
+
+.info-label{
+  font-size:10px;
+  opacity:.45;
+}
+
+.info-value{
+  margin-top:3px;
+  font-size:13px;
+}
+
+.card-note{
+  margin-top:14px;
+  padding-top:12px;
+
+  border-top:1px solid rgba(255,255,255,.3);
+
+  font-size:12px;
+  opacity:.7;
+  font-style:italic;
+}
+
+/ ---------- TIMELINE ---------- /
+
+.timeline{
+  margin-top:14px;
+  border-top:1px solid rgba(255,255,255,.3);
+  padding-top:12px;
+}
+
+.timeline-title{
+  font-size:11px;
+  opacity:.5;
+  margin-bottom:10px;
+}
+
+.timeline-item{
+  margin-bottom:10px;
+}
+
+.timeline-date{
+  font-size:10px;
+  opacity:.45;
+}
+
+.timeline-text{
+  font-size:13px;
+  margin-top:2px;
+}
+
+/ ---------- PURCHASE ---------- /
+
+.purchase-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.purchase-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  background:rgba(255,255,255,.35);
+
+  backdrop-filter:blur(14px);
+
+  border-radius:18px;
+
+  padding:16px;
+}
+
+.monthly-stats{
+  display:flex;
+  gap:12px;
+  overflow:auto;
+  margin-bottom:18px;
+}
+
+.month-card{
+  min-width:140px;
+
+  background:rgba(255,255,255,.3);
+
+  backdrop-filter:blur(14px);
+
+  border-radius:18px;
+
+  padding:14px;
+}
+
+/ ---------- WISHLIST ---------- /
+
+.wishlist-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:16px;
+}
+
+.wishlist-card{
+  background:rgba(255,255,255,.35);
+
+  backdrop-filter:blur(14px);
+
+  border-radius:20px;
+
+  padding:18px;
+}
+
+.wishlist-priority{
+  margin-top:8px;
+  font-size:12px;
+  color:#5a7e5e;
+}
+
+/ ---------- MODAL ---------- /
+
+.modal-overlay{
+  display:none;
+
+  position:fixed;
+  inset:0;
+
+  background:rgba(0,0,0,.35);
+
+  z-index:999;
+
+  align-items:center;
+  justify-content:center;
+
+  padding:20px;
+}
+
+.modal-overlay.open{
+  display:flex;
+}
+
+.modal-box{
+  width:100%;
+  max-width:520px;
+
+  background:rgba(245,240,232,.72);
+
+  backdrop-filter:blur(24px);
+
+  border-radius:28px;
+
+  padding:28px;
+
+  max-height:90vh;
+  overflow:auto;
+}
+
+.modal-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:18px;
+}
+
+.modal-title{
+  font-size:20px;
+  color:#5a7e5e;
+  font-family:'Noto Serif TC',serif;
+}
+
+.modal-close{
+  border:none;
+  background:none;
+  cursor:pointer;
+  font-size:20px;
+}
+
+.form-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+
+.span2{
+  grid-column:span 2;
+}
+
+.form-label{
+  display:block;
+  margin-bottom:6px;
+
+  font-size:11px;
+  opacity:.5;
+}
+
+.form-input,
+.form-select,
+.form-textarea{
+  width:100%;
+
+  border:none;
+
+  background:rgba(255,255,255,.35);
+
+  backdrop-filter:blur(10px);
+
+  border-radius:14px;
+
+  padding:12px;
+
+  font-size:14px;
+}
+
+.form-textarea{
+  resize:vertical;
+  min-height:80px;
+}
+
+.form-actions{
+  display:flex;
+  justify-content:flex-end;
+  gap:10px;
+
+  margin-top:18px;
+}
+
+.btn-cancel,
+.btn-save{
+  border:none;
+  cursor:pointer;
+
+  border-radius:14px;
+
+  padding:12px 18px;
+}
+
+.btn-save{
+  background:linear-gradient(135deg,#7a9e7e,#5a7e5e);
+  color:white;
+}
+
+.empty{
+  text-align:center;
+  opacity:.4;
+  padding:60px 0;
+}
+
+@media(max-width:600px){
+
+  .form-grid{
+    grid-template-columns:1fr;
+  }
+
+  .span2{
+    grid-column:span 1;
+  }
+
+}
+
+</style>
 </head>
+
 <body>
 
 <header>
+
   <div class="header-inner">
+
     <div class="logo">
-      <span class="logo-icon">🌿</span>
-      <span class="logo-title">植物日誌</span>
-      <span class="logo-count" id="logo-count"></span>
+      <div style="font-size:26px">🌿</div>
+      <div class="logo-title">P's 植物日誌</div>
+      <div class="logo-count" id="logo-count"></div>
     </div>
-    <nav class="tabs">
-      <button class="tab-btn active" data-tab="plants">🪴 我的植物</button>
-      <button class="tab-btn" data-tab="purchases">🛒 購買紀錄</button>
-    </nav>
+
+    <div class="tabs">
+
+      <button class="tab-btn active" data-tab="plants">
+        🪴 我的植物
+      </button>
+
+      <button class="tab-btn" data-tab="purchases">
+        🛒 購買紀錄
+      </button>
+
+      <button class="tab-btn" data-tab="wishlist">
+        🌱 Wish List
+      </button>
+
+    </div>
+
   </div>
+
 </header>
 
 <main>
-  <!-- Plants Tab -->
-  <section id="tab-plants" class="section active">
-    <div class="controls">
-      <input type="text" id="search-input" placeholder="🔍 搜尋植物名稱、地點、商店..." />
-      <select id="filter-type">
-        <option value="">全部類型</option>
-        <option>多肉植物</option><option>觀葉植物</option><option>蕨類</option>
-        <option>仙人掌</option><option>香草植物</option><option>開花植物</option>
-        <option>水生植物</option><option>其他</option>
-      </select>
-      <button class="btn-add" id="btn-open-add">＋ 新增植物</button>
-    </div>
-    <div class="stats">
-      <div class="stat-card"><div class="stat-label">總植物數</div><div class="stat-value" id="stat-total"></div></div>
-      <div class="stat-card"><div class="stat-label">今天入手</div><div class="stat-value" id="stat-today"></div></div>
-      <div class="stat-card"><div class="stat-label">健康良好</div><div class="stat-value" id="stat-healthy"></div></div>
-    </div>
-    <div class="plant-grid" id="plant-grid"></div>
-    <div class="empty" id="plant-empty" style="display:none">沒有符合條件的植物 🌱</div>
-  </section>
 
-  <!-- Purchases Tab -->
-  <section id="tab-purchases" class="section">
-    <div class="purchase-stats">
-      <div class="purchase-stat">
-        <div class="purchase-stat-emoji">💰</div>
-        <div class="purchase-stat-value" id="stat-spend"></div>
-        <div class="purchase-stat-label">總花費</div>
-      </div>
-      <div class="purchase-stat">
-        <div class="purchase-stat-emoji">🧾</div>
-        <div class="purchase-stat-value" id="stat-count"></div>
-        <div class="purchase-stat-label">購買筆數</div>
-      </div>
-      <div class="purchase-stat">
-        <div class="purchase-stat-emoji">📊</div>
-        <div class="purchase-stat-value" id="stat-avg"></div>
-        <div class="purchase-stat-label">平均單價</div>
-      </div>
+<!-- plants -->
+
+<section class="section active" id="tab-plants">
+
+  <div class="controls">
+
+    <input
+      type="text"
+      id="search-input"
+      placeholder="🔍 搜尋植物、店家、位置..."
+    >
+
+    <select id="filter-type">
+      <option value="">全部類型</option>
+      <option>觀葉</option>
+      <option>多肉</option>
+      <option>蕨類</option>
+      <option>樹木</option>
+      <option>其他</option>
+    </select>
+
+    <button class="btn-add" id="btn-open-add">
+      ＋ 新增植物
+    </button>
+
+  </div>
+
+  <div class="stats">
+
+    <div class="stat-card">
+      <div class="stat-label">總植物數</div>
+      <div class="stat-value" id="stat-total"></div>
     </div>
-    <div class="purchase-list" id="purchase-list"></div>
-    <div class="empty" id="purchase-empty" style="display:none">還沒有購買紀錄 🛒</div>
-  </section>
+
+    <div class="stat-card">
+      <div class="stat-label">本月入手</div>
+      <div class="stat-value" id="stat-month"></div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-label">今天剛到家</div>
+      <div class="stat-value" id="stat-today"></div>
+    </div>
+
+  </div>
+
+  <div class="plant-grid" id="plant-grid"></div>
+
+  <div class="empty" id="plant-empty" style="display:none">
+    沒有符合條件的植物 🌱
+  </div>
+
+</section>
+
+<!-- purchases -->
+
+<section class="section" id="tab-purchases">
+
+  <div class="monthly-stats" id="monthly-stats"></div>
+
+  <div class="purchase-list" id="purchase-list"></div>
+
+</section>
+
+<!-- wishlist -->
+
+<section class="section" id="tab-wishlist">
+
+  <div class="wishlist-grid" id="wishlist-grid"></div>
+
+</section>
+
 </main>
 
-<!-- Add/Edit Modal -->
+<!-- modal -->
+
 <div class="modal-overlay" id="modal">
+
   <div class="modal-box">
+
     <div class="modal-header">
-      <div class="modal-title" id="modal-title">新增植物</div>
-      <button class="modal-close" id="modal-close">✕</button>
-    </div>
-    <div class="form-grid">
-      <div class="span2">
-        <label class="form-label">植物名稱 *</label>
-        <input class="form-input" id="f-name" placeholder="例：虎尾蘭" />
+      <div class="modal-title" id="modal-title">
+        新增植物
       </div>
+
+      <button class="modal-close" id="modal-close">
+        ✕
+      </button>
+    </div>
+
+    <div class="form-grid">
+
+      <div class="span2">
+        <label class="form-label">植物名稱</label>
+
+        <input class="form-input" id="f-name">
+      </div>
+
       <div>
         <label class="form-label">類型</label>
+
         <select class="form-select" id="f-type">
-          <option>多肉植物</option><option>觀葉植物</option><option>蕨類</option>
-          <option>仙人掌</option><option>香草植物</option><option>開花植物</option>
-          <option>水生植物</option><option>其他</option>
+          <option>觀葉</option>
+          <option>多肉</option>
+          <option>蕨類</option>
+          <option>樹木</option>
+          <option>其他</option>
         </select>
       </div>
+
       <div>
-        <label class="form-label">擺放位置</label>
+        <label class="form-label">位置</label>
+
         <select class="form-select" id="f-location">
-          <option>室內窗邊</option><option>室內書桌</option><option>室內陽台</option>
-          <option>戶外陽台</option><option>花園</option><option>辦公室</option>
+          <option>陽台</option>
+          <option>客廳</option>
+          <option>房間</option>
+          <option>悶箱</option>
         </select>
       </div>
+
       <div>
         <label class="form-label">澆水頻率</label>
+
         <select class="form-select" id="f-water">
-          <option>每天</option><option>每2天</option><option>每週</option>
-          <option>每2週</option><option>每月</option>
+          <option>每週一次</option>
+          <option>2週一次</option>
+          <option>2-3天一次</option>
         </select>
       </div>
+
       <div>
         <label class="form-label">光照需求</label>
+
         <select class="form-select" id="f-light">
-          <option>全日照</option><option>半日照</option><option>散射光</option><option>耐陰</option>
+          <option>散射光</option>
+          <option>全日照</option>
+          <option>耐陰</option>
         </select>
       </div>
-      <div class="span2">
-        <label class="form-label">健康狀態：<span id="health-display">80</span>%</label>
-        <input type="range" class="form-range" id="f-health" min="0" max="100" value="80" />
-      </div>
+
       <div>
         <label class="form-label">入手日期</label>
-        <input type="date" class="form-input" id="f-date" />
+
+        <input type="date" class="form-input" id="f-date">
       </div>
+
       <div>
-        <label class="form-label">購入價格（元）</label>
-        <input type="number" class="form-input" id="f-price" placeholder="0" min="0" />
+        <label class="form-label">購入價格</label>
+
+        <input type="number" class="form-input" id="f-price">
       </div>
+
       <div class="span2">
-        <label class="form-label">購買商店</label>
-        <input class="form-input" id="f-shop" placeholder="例：花時間花藝" />
+        <label class="form-label">購入店家</label>
+
+        <input class="form-input" id="f-shop">
       </div>
+
+      <div class="span2">
+        <label class="form-label">植物照片</label>
+
+        <input
+          type="file"
+          accept="image/*"
+          class="form-input"
+          id="f-image"
+        >
+      </div>
+
       <div class="span2">
         <label class="form-label">備忘錄</label>
-        <textarea class="form-textarea" id="f-note" placeholder="養護心得、特殊注意事項..."></textarea>
+
+        <textarea class="form-textarea" id="f-note"></textarea>
       </div>
+
     </div>
-    <div class="form-actions" style="margin-top:14px">
-      <button class="btn-cancel" id="btn-cancel">取消</button>
-      <button class="btn-save" id="btn-save">儲存</button>
+
+    <div class="form-actions">
+
+      <button class="btn-cancel" id="btn-cancel">
+        取消
+      </button>
+
+      <button class="btn-save" id="btn-save">
+        儲存
+      </button>
+
     </div>
+
   </div>
+
 </div>
 
 <script>
-const TYPE_EMOJI = {"多肉植物":"🪨","觀葉植物":"🌿","蕨類":"🌱","仙人掌":"🌵","香草植物":"🌾","開花植物":"🌸","水生植物":"🌊","其他":"🪴"};
-const STORAGE_KEY = "plant_journal_v1";
 
-const DEFAULT_PLANTS = [
-  {id:1,name:"虎尾蘭",type:"觀葉植物",location:"室內窗邊",water:"每週",light:"散射光",health:90,acquiredDate:"2024-03-15",price:280,shop:"花時間花藝",note:"非常好養，葉片挺拔"},
-  {id:2,name:"圓葉椒草",type:"觀葉植物",location:"室內書桌",water:"每週",light:"散射光",health:75,acquiredDate:"2024-07-02",price:150,shop:"綠意盎然",note:""},
-  {id:3,name:"玉露",type:"多肉植物",location:"室內陽台",water:"每2週",light:"散射光",health:85,acquiredDate:"2025-01-20",price:320,shop:"多肉星球",note:"喜歡涼爽環境"},
-  {id:4,name:"波士頓蕨",type:"蕨類",location:"室內窗邊",water:"每2天",light:"散射光",health:60,acquiredDate:"2025-11-01",price:200,shop:"花時間花藝",note:"需要保持濕潤"},
-  {id:5,name:"薰衣草",type:"香草植物",location:"戶外陽台",water:"每週",light:"全日照",health:95,acquiredDate:"2026-05-06",price:120,shop:"香草園",note:"今天剛買的！"},
-];
+const STORAGE_VERSION = 2;
+const STORAGE_KEY = "plant_journal_pro";
 
-// ── State ──────────────────────────────────────────────
-let plants = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null") || DEFAULT_PLANTS;
-let nextId = plants.reduce((m,p)=>Math.max(m,p.id),0) + 1;
-let editingId = null;
+const TYPE_EMOJI = {
+  "觀葉":"🌿",
+  "多肉":"🪨",
+  "蕨類":"🌱",
+  "樹木":"🌳",
+  "其他":"🪴"
+};
 
-function save() { localStorage.setItem(STORAGE_KEY, JSON.stringify(plants)); }
+const DEFAULT_DATA = {
 
-// ── Duration calc ──────────────────────────────────────
-function calcDuration(dateStr) {
-  const a = new Date(dateStr); a.setHours(0,0,0,0);
-  const t = new Date(); t.setHours(0,0,0,0);
-  const days = Math.round((t - a) / 86400000);
-  if (days === 0) return null;
-  if (days < 30) return `${days} 天`;
-  let months = (t.getFullYear()-a.getFullYear())*12 + (t.getMonth()-a.getMonth());
-  if (t.getDate() < a.getDate()) months--;
-  if (months < 12) return `${months} 個月`;
-  const y = Math.floor(months/12), m = months%12;
-  return m > 0 ? `${y} 年 ${m} 個月` : `${y} 年`;
+  version: STORAGE_VERSION,
+
+  plants:[
+    {
+      id:1,
+      name:"白斑龜背芋",
+      type:"觀葉",
+      location:"客廳",
+      water:"每週一次",
+      light:"散射光",
+      acquiredDate:"2026-05-06",
+      price:1800,
+      shop:"植物巷弄",
+
+      note:"新葉正在展開 🌱",
+
+      image:"",
+
+      timeline:[
+        {
+          date:"2026-05-07",
+          text:"新芽冒出"
+        },
+        {
+          date:"2026-05-08",
+          text:"葉子開始打開"
+        }
+      ]
+    }
+  ],
+
+  wishlist:[
+    {
+      name:"斑葉姬龜背",
+      note:"想找奶油斑",
+      priority:"高"
+    },
+    {
+      name:"鹿角蕨",
+      note:"想做上板",
+      priority:"中"
+    }
+  ]
+
+};
+
+function loadData(){
+
+  const raw = localStorage.getItem(STORAGE_KEY);
+
+  if(!raw) return DEFAULT_DATA;
+
+  try{
+
+    const parsed = JSON.parse(raw);
+
+    if(Array.isArray(parsed)){
+
+      return {
+        version: STORAGE_VERSION,
+        plants: parsed,
+        wishlist:[]
+      };
+
+    }
+
+    return parsed;
+
+  }catch{
+
+    return DEFAULT_DATA;
+
+  }
+
 }
 
-// ── Render plants ──────────────────────────────────────
-function renderPlants() {
-  const q = document.getElementById("search-input").value.trim().toLowerCase();
-  const ft = document.getElementById("filter-type").value;
-  const filtered = plants.filter(p => {
-    const match = !q || p.name.includes(q) || p.shop.includes(q) || p.location.includes(q);
-    return match && (!ft || p.type === ft);
+let data = loadData();
+
+let plants = data.plants;
+let wishlist = data.wishlist;
+
+let nextId =
+  plants.reduce((m,p)=>Math.max(m,p.id),0)+1;
+
+let editingId = null;
+let currentImage = "";
+
+function save(){
+
+  localStorage.setItem(
+    STORAGE_KEY,
+
+    JSON.stringify({
+      version: STORAGE_VERSION,
+      plants,
+      wishlist
+    })
+
+  );
+
+}
+
+function esc(s){
+  const d=document.createElement("div");
+  d.textContent=s || "";
+  return d.innerHTML;
+}
+
+function calcDuration(dateStr){
+
+  const a = new Date(dateStr);
+  const t = new Date();
+
+  if(a > t) return "未來日期";
+
+  a.setHours(0,0,0,0);
+  t.setHours(0,0,0,0);
+
+  const total =
+    Math.round((t-a)/86400000);
+
+  if(total===0) return null;
+
+  return total + "天";
+
+}
+
+function renderPlants(){
+
+  const q =
+    document
+    .getElementById("search-input")
+    .value
+    .trim()
+    .toLowerCase();
+
+  const type =
+    document
+    .getElementById("filter-type")
+    .value;
+
+  const filtered = plants.filter(p=>{
+
+    const match =
+      !q ||
+
+      p.name.toLowerCase().includes(q) ||
+
+      (p.shop || "")
+      .toLowerCase()
+      .includes(q) ||
+
+      (p.location || "")
+      .toLowerCase()
+      .includes(q);
+
+    return match &&
+      (!type || p.type===type);
+
   });
 
-  document.getElementById("logo-count").textContent = `${plants.length} 株`;
-  document.getElementById("stat-total").textContent = `${plants.length} 株`;
-  document.getElementById("stat-today").textContent = `${plants.filter(p=>calcDuration(p.acquiredDate)===null).length} 株`;
-  document.getElementById("stat-healthy").textContent = `${plants.filter(p=>p.health>=80).length} 株`;
+  document.getElementById("logo-count")
+  .textContent = plants.length + " 株";
 
-  const grid = document.getElementById("plant-grid");
-  const empty = document.getElementById("plant-empty");
+  document.getElementById("stat-total")
+  .textContent = plants.length;
 
-  if (filtered.length === 0) { grid.innerHTML=""; empty.style.display="block"; return; }
+  const todayCount =
+    plants.filter(p=>
+      calcDuration(p.acquiredDate)===null
+    ).length;
+
+  document.getElementById("stat-today")
+  .textContent = todayCount;
+
+  const now = new Date();
+
+  const monthCount =
+    plants.filter(p=>{
+
+      const d = new Date(p.acquiredDate);
+
+      return d.getMonth()===now.getMonth()
+        && d.getFullYear()===now.getFullYear();
+
+    }).length;
+
+  document.getElementById("stat-month")
+  .textContent = monthCount;
+
+  const grid =
+    document.getElementById("plant-grid");
+
+  const empty =
+    document.getElementById("plant-empty");
+
+  if(filtered.length===0){
+
+    grid.innerHTML = "";
+    empty.style.display = "block";
+
+    return;
+
+  }
+
   empty.style.display = "none";
 
-  grid.innerHTML = filtered.map(p => {
-    const dur = calcDuration(p.acquiredDate);
-    const isToday = dur === null;
-    const hColor = p.health>=80?"#7a9e7e":p.health>=50?"#c4a55a":"#c47a6a";
-    return `
-    <div class="plant-card">
-      ${isToday?'<div class="new-badge">NEW</div>':""}
-      <div class="card-top">
-        <div>
-          <div class="card-emoji">${TYPE_EMOJI[p.type]||"🪴"}</div>
-          <div class="card-name">${esc(p.name)}</div>
-          <div class="card-meta">${esc(p.type)} · ${esc(p.location)}</div>
+  grid.innerHTML =
+    filtered.map(p=>{
+
+      const dur =
+        calcDuration(p.acquiredDate);
+
+      return        <div class="plant-card">          ${           dur===null           ?<div class="new-badge">NEW</div>`
+          : ""
+        }
+
+        ${
+          p.image
+          ? `
+            <img
+              class="plant-photo"
+              src="${p.image}"
+            >
+          `
+          : ""
+        }
+
+        <div class="card-top">
+
+          <div>
+
+            <div class="card-name">
+              ${esc(p.name)}
+            </div>
+
+            <div class="card-meta">
+              ${esc(p.type)} · ${esc(p.location)}
+            </div>
+
+          </div>
+
+          <div class="card-actions">
+
+            <button onclick="openEdit(${p.id})">
+              ✏️
+            </button>
+
+            <button onclick="deletePlant(${p.id})">
+              🗑
+            </button>
+
+          </div>
+
         </div>
-        <div class="card-actions">
-          <button onclick="openEdit(${p.id})">✏️</button>
-          <button onclick="deletePlant(${p.id})">🗑</button>
+
+        <div class="card-info">
+
+          <div class="info-cell">
+            <div class="info-label">
+              💧 澆水
+            </div>
+
+            <div class="info-value">
+              ${esc(p.water)}
+            </div>
+          </div>
+
+          <div class="info-cell">
+            <div class="info-label">
+              ☀️ 光照
+            </div>
+
+            <div class="info-value">
+              ${esc(p.light)}
+            </div>
+          </div>
+
+          <div class="info-cell">
+            <div class="info-label">
+              ⏳ 種植時間
+            </div>
+
+            <div class="info-value">
+              ${
+                dur===null
+                ? "今天剛到家 🎉"
+                : dur
+              }
+            </div>
+          </div>
+
+          <div class="info-cell">
+            <div class="info-label">
+              💰 購入價格
+            </div>
+
+            <div class="info-value">
+              $${(+p.price || 0).toLocaleString()}
+            </div>
+          </div>
+
         </div>
+
+        ${
+          p.note
+          ? `
+            <div class="card-note">
+              "${esc(p.note)}"
+            </div>
+          `
+          : ""
+        }
+
+        ${
+          p.timeline?.length
+          ? `
+            <div class="timeline">
+
+              <div class="timeline-title">
+                🌱 成長日記
+              </div>
+
+              ${
+                p.timeline.map(t=>`
+
+                  <div class="timeline-item">
+
+                    <div class="timeline-date">
+                      ${t.date}
+                    </div>
+
+                    <div class="timeline-text">
+                      ${t.text}
+                    </div>
+
+                  </div>
+
+                `).join("")
+              }
+
+            </div>
+          `
+          : ""
+        }
+
       </div>
-      <div class="card-info">
-        <div class="info-cell"><div class="info-label">💧 澆水</div><div class="info-value">${esc(p.water)}</div></div>
-        <div class="info-cell"><div class="info-label">☀️ 光照</div><div class="info-value">${esc(p.light)}</div></div>
-        <div class="info-cell"><div class="info-label">⏳ 種植</div><div class="info-value ${isToday?'today':''}">${isToday?"今天剛到家 🎉":dur}</div></div>
-        <div class="info-cell">
-          <div class="info-label">💚 健康</div>
-          <div class="health-track"><div class="health-fill" style="width:${p.health}%;background:${hColor}"></div></div>
-          <div class="health-pct">${p.health}%</div>
-        </div>
-      </div>
-      ${p.note?`<div class="card-note">"${esc(p.note)}"</div>`:""}
-    </div>`;
-  }).join("");
+
+      `;
+
+    }).join("");
+
 }
 
-function renderPurchases() {
-  const sorted = [...plants].filter(p=>p.price>0).sort((a,b)=>new Date(b.acquiredDate)-new Date(a.acquiredDate));
-  const total = sorted.reduce((s,p)=>s+(+p.price||0),0);
-  const avg = sorted.length ? Math.round(total/sorted.length) : 0;
-  document.getElementById("stat-spend").textContent = `$${total.toLocaleString()}`;
-  document.getElementById("stat-count").textContent = `${sorted.length} 筆`;
-  document.getElementById("stat-avg").textContent = `$${avg}`;
+function renderPurchases(){
 
-  const list = document.getElementById("purchase-list");
-  const empty = document.getElementById("purchase-empty");
-  if (sorted.length===0){list.innerHTML="";empty.style.display="block";return;}
-  empty.style.display="none";
-  list.innerHTML = sorted.map(p=>{
-    const dur=calcDuration(p.acquiredDate);
-    return `
-    <div class="purchase-item">
-      <div class="purchase-icon">🪴</div>
-      <div class="purchase-info">
-        <div class="purchase-name">${esc(p.name)}</div>
-        <div class="purchase-sub">${esc(p.shop||"未知商店")} · ${p.acquiredDate} · ${dur===null?"今天剛到家 🎉":"已養 "+dur}</div>
-      </div>
-      <div class="purchase-price">
-        <div class="purchase-amount">$${(+p.price).toLocaleString()}</div>
-        <div class="purchase-type">${esc(p.type)}</div>
-      </div>
-    </div>`;
-  }).join("");
-}
+  const sorted =
+    [...plants]
+    .filter(p=>p.price>0)
+    .sort((a,b)=>
+      new Date(b.acquiredDate)
+      - new Date(a.acquiredDate)
+    );
 
-function renderAll(){ renderPlants(); renderPurchases(); }
+  const monthly = {};
 
-function esc(s){ const d=document.createElement("div");d.textContent=s;return d.innerHTML; }
+  sorted.forEach(p=>{
 
-// ── Tabs ──────────────────────────────────────────────
-document.querySelectorAll(".tab-btn").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-    document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-    btn.classList.add("active");
-    document.getElementById("tab-"+btn.dataset.tab).classList.add("active");
+    const key =
+      p.acquiredDate.slice(0,7);
+
+    monthly[key] =
+      (monthly[key] || 0)
+      + (+p.price || 0);
+
   });
+
+  document.getElementById("monthly-stats")
+  .innerHTML =
+
+    Object.entries(monthly)
+    .map(([month,total])=>`
+
+      <div class="month-card">
+
+        <div style="opacity:.5;font-size:12px">
+          ${month}
+        </div>
+
+        <div style="margin-top:6px;font-size:22px;font-weight:700;color:#5a7e5e">
+          $${total.toLocaleString()}
+        </div>
+
+      </div>
+
+    `).join("");
+
+  document.getElementById("purchase-list")
+  .innerHTML =
+
+    sorted.map(p=>`
+
+      <div class="purchase-item">
+
+        <div>
+
+          <div style="font-weight:700">
+            ${esc(p.name)}
+          </div>
+
+          <div style="font-size:12px;opacity:.5;margin-top:4px">
+            ${esc(p.shop || "未知店家")}
+            ·
+            ${p.acquiredDate}
+          </div>
+
+        </div>
+
+        <div style="font-weight:700;color:#5a7e5e">
+          $${(+p.price).toLocaleString()}
+        </div>
+
+      </div>
+
+    `).join("");
+
+}
+
+function renderWishlist(){
+
+  document.getElementById("wishlist-grid")
+  .innerHTML =
+
+    wishlist.map(w=>`
+
+      <div class="wishlist-card">
+
+        <div style="font-size:20px">
+          🌱
+        </div>
+
+        <div style="margin-top:10px;font-weight:700">
+          ${esc(w.name)}
+        </div>
+
+        <div style="margin-top:6px;font-size:13px;opacity:.6">
+          ${esc(w.note)}
+        </div>
+
+        <div class="wishlist-priority">
+          ${w.priority} priority
+        </div>
+
+      </div>
+
+    `).join("");
+
+}
+
+function renderAll(){
+
+  renderPlants();
+  renderPurchases();
+  renderWishlist();
+
+}
+
+/ ---------- tabs ---------- /
+
+document
+.querySelectorAll(".tab-btn")
+.forEach(btn=>{
+
+  btn.addEventListener("click",()=>{
+
+    document
+    .querySelectorAll(".tab-btn")
+    .forEach(b=>
+      b.classList.remove("active")
+    );
+
+    document
+    .querySelectorAll(".section")
+    .forEach(s=>
+      s.classList.remove("active")
+    );
+
+    btn.classList.add("active");
+
+    document
+    .getElementById(
+      "tab-" + btn.dataset.tab
+    )
+    .classList.add("active");
+
+  });
+
 });
 
-// ── Search / filter ───────────────────────────────────
-document.getElementById("search-input").addEventListener("input", renderPlants);
-document.getElementById("filter-type").addEventListener("change", renderPlants);
+/ ---------- search ---------- /
 
-// ── Modal ─────────────────────────────────────────────
-const modal = document.getElementById("modal");
-function openModal(title){ document.getElementById("modal-title").textContent=title; modal.classList.add("open"); }
-function closeModal(){ modal.classList.remove("open"); editingId=null; }
-document.getElementById("modal-close").addEventListener("click", closeModal);
-document.getElementById("btn-cancel").addEventListener("click", closeModal);
-modal.addEventListener("click", e=>{ if(e.target===modal) closeModal(); });
+document
+.getElementById("search-input")
+.addEventListener("input",renderPlants);
 
-document.getElementById("f-health").addEventListener("input", e=>{
-  document.getElementById("health-display").textContent = e.target.value;
+document
+.getElementById("filter-type")
+.addEventListener("change",renderPlants);
+
+/ ---------- modal ---------- */
+
+const modal =
+  document.getElementById("modal");
+
+function openModal(title){
+
+  document
+  .getElementById("modal-title")
+  .textContent = title;
+
+  modal.classList.add("open");
+
+}
+
+function closeModal(){
+
+  modal.classList.remove("open");
+
+  editingId = null;
+
+}
+
+document
+.getElementById("modal-close")
+.addEventListener("click",closeModal);
+
+document
+.getElementById("btn-cancel")
+.addEventListener("click",closeModal);
+
+modal.addEventListener("click",e=>{
+
+  if(e.target===modal){
+    closeModal();
+  }
+
 });
 
 function resetForm(){
-  const today = new Date().toISOString().split("T")[0];
+
+  const today =
+    new Date()
+    .toISOString()
+    .split("T")[0];
+
   document.getElementById("f-name").value="";
-  document.getElementById("f-type").value="觀葉植物";
-  document.getElementById("f-location").value="室內窗邊";
-  document.getElementById("f-water").value="每週";
+  document.getElementById("f-type").value="觀葉";
+  document.getElementById("f-location").value="陽台";
+  document.getElementById("f-water").value="每週一次";
   document.getElementById("f-light").value="散射光";
-  document.getElementById("f-health").value=80;
-  document.getElementById("health-display").textContent=80;
   document.getElementById("f-date").value=today;
+  document.getElementById("f-date").max=today;
   document.getElementById("f-price").value="";
   document.getElementById("f-shop").value="";
   document.getElementById("f-note").value="";
+  document.getElementById("f-image").value="";
+
+  currentImage = "";
+
 }
 
 function fillForm(p){
+
   document.getElementById("f-name").value=p.name;
   document.getElementById("f-type").value=p.type;
   document.getElementById("f-location").value=p.location;
   document.getElementById("f-water").value=p.water;
   document.getElementById("f-light").value=p.light;
-  document.getElementById("f-health").value=p.health;
-  document.getElementById("health-display").textContent=p.health;
   document.getElementById("f-date").value=p.acquiredDate;
-  document.getElementById("f-price").value=p.price||"";
-  document.getElementById("f-shop").value=p.shop||"";
-  document.getElementById("f-note").value=p.note||"";
+  document.getElementById("f-price").value=p.price;
+  document.getElementById("f-shop").value=p.shop;
+  document.getElementById("f-note").value=p.note;
+
+  currentImage = p.image || "";
+
 }
 
 function readForm(){
+
   return {
-    name: document.getElementById("f-name").value.trim(),
-    type: document.getElementById("f-type").value,
-    location: document.getElementById("f-location").value,
-    water: document.getElementById("f-water").value,
-    light: document.getElementById("f-light").value,
-    health: +document.getElementById("f-health").value,
-    acquiredDate: document.getElementById("f-date").value,
-    price: +document.getElementById("f-price").value||0,
-    shop: document.getElementById("f-shop").value.trim(),
-    note: document.getElementById("f-note").value.trim(),
+
+    name:
+      document
+      .getElementById("f-name")
+      .value
+      .trim(),
+
+    type:
+      document
+      .getElementById("f-type")
+      .value,
+
+    location:
+      document
+      .getElementById("f-location")
+      .value,
+
+    water:
+      document
+      .getElementById("f-water")
+      .value,
+
+    light:
+      document
+      .getElementById("f-light")
+      .value,
+
+    acquiredDate:
+      document
+      .getElementById("f-date")
+      .value,
+
+    price:
+      +document
+      .getElementById("f-price")
+      .value || 0,
+
+    shop:
+      document
+      .getElementById("f-shop")
+      .value
+      .trim(),
+
+    note:
+      document
+      .getElementById("f-note")
+      .value
+      .trim()
+
   };
+
 }
 
-document.getElementById("btn-open-add").addEventListener("click",()=>{
-  editingId=null; resetForm(); openModal("➕ 新增植物");
+function readImageFile(file){
+
+  return new Promise(resolve=>{
+
+    if(!file){
+
+      resolve(currentImage || "");
+
+      return;
+
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = e=>{
+
+      resolve(e.target.result);
+
+    };
+
+    reader.readAsDataURL(file);
+
+  });
+
+}
+
+document
+.getElementById("btn-open-add")
+.addEventListener("click",()=>{
+
+  editingId = null;
+
+  resetForm();
+
+  openModal("➕ 新增植物");
+
 });
 
 function openEdit(id){
-  const p=plants.find(x=>x.id===id); if(!p) return;
-  editingId=id; fillForm(p); openModal("✏️ 編輯植物");
+
+  const p =
+    plants.find(x=>x.id===id);
+
+  if(!p) return;
+
+  editingId = id;
+
+  fillForm(p);
+
+  openModal("✏️ 編輯植物");
+
 }
 
-document.getElementById("btn-save").addEventListener("click",()=>{
-  const f=readForm(); if(!f.name) return;
+document
+.getElementById("btn-save")
+.addEventListener("click",async()=>{
+
+  const f = readForm();
+
+  if(!f.name) return;
+
+  const imageFile =
+    document
+    .getElementById("f-image")
+    .files[0];
+
+  f.image =
+    await readImageFile(imageFile);
+
+  f.timeline = [
+    {
+      date:
+        new Date()
+        .toISOString()
+        .split("T")[0],
+
+      text:"紀錄已更新 🌿"
+    }
+  ];
+
   if(editingId!==null){
-    plants=plants.map(p=>p.id===editingId?{...f,id:editingId}:p);
-  } else {
-    plants.push({...f,id:nextId++});
+
+    plants = plants.map(p=>
+
+      p.id===editingId
+      ? {
+          ...p,
+          ...f
+        }
+      : p
+
+    );
+
+  }else{
+
+    plants.push({
+      ...f,
+      id:nextId++
+    });
+
   }
-  save(); closeModal(); renderAll();
+
+  save();
+
+  closeModal();
+
+  renderAll();
+
 });
 
-window.openEdit=openEdit;
-window.deletePlant=function(id){
-  if(!confirm("確定要刪除這株植物嗎？")) return;
-  plants=plants.filter(p=>p.id!==id); save(); renderAll();
+window.openEdit = openEdit;
+
+window.deletePlant = function(id){
+
+  if(!confirm("確定要刪除這株植物嗎？")){
+    return;
+  }
+
+  plants =
+    plants.filter(p=>p.id!==id);
+
+  save();
+
+  renderAll();
+
 };
 
-// ── Init ──────────────────────────────────────────────
 renderAll();
+
 </script>
+
 </body>
 </html>
+`
